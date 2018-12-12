@@ -1,3 +1,4 @@
+#' @export
 get_pathway_network<-function(pathwayDB,pathway_name,original_network)
 {
 	list_of_pathways = pathways("hsapiens", pathwayDB)

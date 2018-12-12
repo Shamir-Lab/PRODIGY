@@ -1,3 +1,4 @@
+#' @export
 get_enrichment_pvalue<-function(pathway_nodes,diff_genes,expression_matrix_genes)
 {
 	target_set = intersect(pathway_nodes,expression_matrix_genes)

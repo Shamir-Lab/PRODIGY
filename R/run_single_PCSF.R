@@ -1,3 +1,4 @@
+#' @export
 run_single_PCSF<-function(pathway_network,driver_gene,original_network,pathway_prizes,alpha)
 {
 	#add edges that touch the driver and add negative prizes for these nodes

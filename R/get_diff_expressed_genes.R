@@ -1,3 +1,4 @@
+#' @export
 get_diff_expressed_genes<-function(expression_matrix,sample,sample_origins)
 {
 	if(length(which(sample_origins == "normal")) < 1)

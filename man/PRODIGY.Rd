@@ -6,7 +6,8 @@
 \usage{
 PRODIGY(snp_matrix, expression_matrix, network = NULL, sample,
   diff_genes = NULL, alpha = 0.05, pathwayDB = "reactome",
-  num_of_cores = 1, sample_origins = NULL)
+  num_of_cores = 1, sample_origins = NULL, write_results = F,
+  results_folder = "./")
 }
 \arguments{
 \item{snp_matrix}{A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.}
@@ -26,6 +27,10 @@ PRODIGY(snp_matrix, expression_matrix, network = NULL, sample,
 \item{num_of_cores}{The number of CPU cores to be used by the influence scores calculation step.}
 
 \item{sample_origins}{A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.}
+
+\item{write_results}{Should the results be written to text files?}
+
+\item{results_folder}{Location for resulting influence matrices storage (if write_results = T)}
 }
 \value{
 A matrix of influence scores for every mutation and every enriched pathway.
@@ -41,6 +46,7 @@ data(COAD_Expression)
 data(STRING_network)
 network = STRING_network
 sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
+# Identify sample origins (tumor or normal)
 sample_origins = rep("tumor",ncol(expression_matrix))
 sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 res = PRODIGY<-function(snp_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)

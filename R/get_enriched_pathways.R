@@ -1,3 +1,4 @@
+#' @export
 get_enriched_pathways<-function(diff_genes,pathwayDB,expression_matrix_genes,pathwayDB_nodes)
 {
 	enrichment_pvalue = c()

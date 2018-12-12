@@ -5,8 +5,9 @@
 \title{PRODIGY_cohort}
 \usage{
 PRODIGY_cohort(snp_matrix, expression_matrix, network = NULL,
-  samples = NULL, DEGs = NULL, results_folder = "./", alpha = 0.05,
-  pathwayDB = "reactome", num_of_cores = 1, sample_origins = NULL)
+  samples = NULL, DEGs = NULL, alpha = 0.05,
+  pathwayDB = "reactome", num_of_cores = 1, sample_origins = NULL,
+  write_results = F, results_folder = "./")
 }
 \arguments{
 \item{snp_matrix}{A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.}
@@ -24,6 +25,10 @@ PRODIGY_cohort(snp_matrix, expression_matrix, network = NULL,
 \item{num_of_cores}{The number of CPU cores to be used by the influence scores calculation step.}
 
 \item{sample_origins}{A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.}
+
+\item{write_results}{Should the results be written to text files?}
+
+\item{results_folder}{Location for resulting influence matrices storage (if write_results = T)}
 
 \item{sample}{The sample labels as appears in the SNP and expression matrices.}
 }

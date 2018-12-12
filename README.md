@@ -13,14 +13,14 @@ install_github("Shamir-Lab/PRODIGY")
 
 Needed packages and minimal versions:
 
-MASS_7.3-50
-DESeq2_1.16.1
-igraph_1.2.2
-ff_2.2-14
-plyr_1.8.4
-biomaRt_2.32.1
-PCSF_0.99.1
-mixtools_1.1.0
+- MASS_7.3-50
+- DESeq2_1.16.1
+- igraph_1.2.2
+- ff_2.2-14
+- plyr_1.8.4
+- biomaRt_2.32.1
+- PCSF_0.99.1
+- mixtools_1.1.0
 
 ## Simple run example
 ```r

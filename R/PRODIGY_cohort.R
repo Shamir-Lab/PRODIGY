@@ -30,7 +30,7 @@
 #' @references
 #' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
-
+#' @export
 PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,results_folder = "./",alpha=0.05,pathwayDB="reactome",
 			num_of_cores=1,sample_origins = NULL)
 {

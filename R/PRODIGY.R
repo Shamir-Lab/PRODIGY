@@ -29,6 +29,7 @@
 #' Gillespie, M., Vastrik, I., Eustachio, P. D., Schmidt, E. & Bono, B. De. Reactome?: a knowledgebase of biological pathways. Nucleic Acids Res. 33, 428-432 (2005).
 #' Schaefer, C. F. et al. PID: The pathway interaction database. Nucleic Acids Res. 37, 674-679 (2009).
 #' Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
+#' @export
 PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",
 			num_of_cores=1,sample_origins = NULL)
 {

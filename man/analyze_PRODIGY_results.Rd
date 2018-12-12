@@ -16,5 +16,5 @@ A list of ranked genes per sample.
 This function analyzes PRODIGY's results (influence score matrices) to rank individual driver genes for a group of patients.
 }
 \examples{
-results = analyze_PRODIGY_results(all_patients_scores) #' @references
+results = analyze_PRODIGY_results(all_patients_scores)
 }

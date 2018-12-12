@@ -4,7 +4,8 @@
 #' @param all_patients_scores Either a list of influence scores matrices or a single matrix received by the PRODIGY algorithm.
 #' @return A list of ranked genes per sample.
 #' @examples
-#' results = analyze_PRODIGY_results(all_patients_scores) #' @references
+#' results = analyze_PRODIGY_results(all_patients_scores)
+#' @export
 analyze_PRODIGY_results<-function(all_patients_scores)
 {
 	libraries = c("DESeq2","igraph","plyr","biomaRt","MASS","mixtools")

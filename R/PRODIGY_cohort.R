@@ -10,6 +10,8 @@
 #' @param pathwayDB The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").
 #' @param num_of_cores The number of CPU cores to be used by the influence scores calculation step.
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
+#' @param write_results Should the results be written to text files?
+#' @param results_folder Location for resulting influence matrices storage (if write_results = T) 
 #' @return A list of influence scores matrices.
 #' @examples
 #' data(COAD_SNP)
@@ -31,8 +33,8 @@
 #' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
 #' @export
-PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,results_folder = "./",alpha=0.05,pathwayDB="reactome",
-			num_of_cores=1,sample_origins = NULL)
+PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,alpha=0.05,pathwayDB="reactome",
+			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./")
 {
 	#load needed R external packages
 	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
@@ -74,7 +76,7 @@ PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,
 			diff_genes = DEGs[[sample]] 
 		} else { diff_genes = NULL }
 		all_patients_scores[[sample]] = PRODIGY(snp_matrix,expression_matrix,network,sample,diff_genes,alpha=alpha,pathwayDB=pathwayDB,
-			num_of_cores=num_of_cores,sample_origins = sample_origins)
+			num_of_cores=num_of_cores,sample_origins = sample_origins,write_results = write_results,results_folder = results_folder)
 	}
 	return(all_patients_scores)
 }

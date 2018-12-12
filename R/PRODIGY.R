@@ -10,6 +10,8 @@
 #' @param pathwayDB The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").
 #' @param num_of_cores The number of CPU cores to be used by the influence scores calculation step.
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
+#' @param write_results Should the results be written to text files?
+#' @param results_folder Location for resulting influence matrices storage (if write_results = T)
 #' @return A matrix of influence scores for every mutation and every enriched pathway.
 #' @examples
 #' # Load SNP+expression data from TCGA
@@ -31,7 +33,7 @@
 #' Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
 #' @export
 PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",
-			num_of_cores=1,sample_origins = NULL)
+			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./")
 {
 	#load needed R external packages
 	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
@@ -122,6 +124,11 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 		Fraction_of_DEGs_matrix = rbind(Fraction_of_DEGs_matrix ,fraction_of_DEGs_values)
 		rownames(Fraction_of_DEGs_matrix)[nrow(Fraction_of_DEGs_matrix )] = pathway_name 
 		gc()
+	}
+	if(write_results)
+	{
+		write.table(Influence_matrix[-1,],file=paste(results_folder,sample,"influence_scores.txt",sep="")
+					,quote=F,col.names=T,row.names=T)
 	}
 	return(Influence_matrix[-1,])
 }

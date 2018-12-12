@@ -1,3 +1,4 @@
+
 # PRODIGY
 This R package prioritize driver genes for individual cancer patients.
 
@@ -35,6 +36,7 @@ network = STRING_network
 samples = intersect(colnames(expression_matrix),colnames(snp_matrix))[1:5]
 # Get differentially expressed genes (DEGs) for all samples
 expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
+library(DESeq2)
 DEGs = get_DEGs(expression_matrix,samples,sample_origins=NULL)
 # Identify sample origins (tumor or normal)
 sample_origins = rep("tumor",ncol(expression_matrix))

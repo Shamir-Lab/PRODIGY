@@ -21,7 +21,7 @@
 #' data(STRING_network)
 #' network = STRING_network
 #' sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
-# Identify sample origins (tumor or normal)
+#' # Identify sample origins (tumor or normal)
 #' sample_origins = rep("tumor",ncol(expression_matrix))
 #' sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 #' res = PRODIGY<-function(snp_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)

@@ -12,7 +12,7 @@
 #' expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
 #' DEGs = get_DEGs(expression_matrix,samples,sample_origins=NULL)
 #' @references
-#' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1–21 (2014).
+#' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 get_DEGs<-function(expression_matrix,samples,sample_origins=NULL)
 {
 	if(is.null(sample_origins))

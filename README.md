@@ -29,7 +29,7 @@ library(PRODIGY)
 data(COAD_SNP)
 data(COAD_Expression)
 # Load STRING network data 
-load("data/STRING_network.RData")
+data(STRING_network)
 network = STRING_network
 # Take samples for which SNP and expression is available 
 samples = intersect(colnames(expression_matrix),colnames(snp_matrix))[1:5]

@@ -35,7 +35,7 @@ PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,
 			num_of_cores=1,sample_origins = NULL)
 {
 	#load needed R external packages
-	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF")
+	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
 	for(j in 1:length(libraries)){
 	try({library(libraries[j],character.only=T)})
 	}

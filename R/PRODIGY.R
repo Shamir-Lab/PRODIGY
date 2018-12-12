@@ -34,7 +34,7 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 			num_of_cores=1,sample_origins = NULL)
 {
 	#load needed R external packages
-	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF")
+	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
 	for(j in 1:length(libraries)){
 	try({library(libraries[j],character.only=T)})
 	}

@@ -1,0 +1,12 @@
+Package: PRODIGY
+Title: Personalized prioritization of driver genes
+Version: 1.0
+Authors: Gal Dinstag, Ron Shamir
+Reference: Dinstag, G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018)  
+Maintainer: Gal Dinstag <galdinstag@mail.tau.ac.il>
+Description: PRODIGY analyzes the expression and SNV profiles of a patient along with data on known pathways and protein-protein interactions. PRODIGY quantifies the impact of each mutated gene on every transcriptionally deregulated pathway using the prize collecting Steiner tree model. Mutated genes are ranked by their aggregated impact on all deregulated pathways.
+Depends: R (>= 3.4.3)
+License: GPL
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1

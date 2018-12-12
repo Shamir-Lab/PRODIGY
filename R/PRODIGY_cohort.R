@@ -47,9 +47,10 @@ PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,
 	}
 	# we use predefined lists of pathways from Reactome, KEGG or NCI PID
 	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))
-	if(pathwayDB == "reactome"){	data(Reactome) 
-	}else if(pathwayDB == "kegg") { data(Kegg)
-	}else if(pathwayDB == "nci"){	data(NCI_PID) 
+	data(pathwayDB_nodes)
+	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]] 
+	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]]
+	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]] 
 	} else { 
 		print("no pathwayDB selected. aborting")
 		return()

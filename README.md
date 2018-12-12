@@ -2,7 +2,7 @@
 This R package prioritize driver genes for individual cancer patients.
 
 The details of the method are described in
-Dinstag, G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018)
+Dinstag, G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018), 
 https://www.biorxiv.org/content/early/2018/10/30/456723
 
 ## Package installation
@@ -26,8 +26,8 @@ Needed packages and minimal versions:
 ```r
 library(PRODIGY)
 # Load SNP+expression data derived from TCGA
-load("data/COAD_SNP.RData")
-load("data/COAD_Expression.RData")
+data(COAD_SNP)
+data(COAD_Expression)
 # Load STRING network data 
 load("data/STRING_network.RData")
 network = STRING_network

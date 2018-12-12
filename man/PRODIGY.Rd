@@ -35,10 +35,10 @@ This function runs the PRODIGY algorithm for a single patient.
 }
 \examples{
 # Load SNP+expression data from TCGA
-load("data/COAD_SNP.RData")
-load("data/COAD_Expression.RData")
+data(COAD_SNP)
+data(COAD_Expression)
 # Load STRING network data 
-load("data/STRING_network.RData")
+data(STRING_network)
 network = STRING_network
 sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
 sample_origins = rep("tumor",ncol(expression_matrix))

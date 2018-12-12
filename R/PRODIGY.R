@@ -13,10 +13,10 @@
 #' @return A matrix of influence scores for every mutation and every enriched pathway.
 #' @examples
 #' # Load SNP+expression data from TCGA
-#' load("data/COAD_SNP.RData")
-#' load("data/COAD_Expression.RData")
+#' data(COAD_SNP)
+#' data(COAD_Expression)
 #' # Load STRING network data 
-#' load("data/STRING_network.RData")
+#' data(STRING_network)
 #' network = STRING_network
 #' sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
 # Identify sample origins (tumor or normal)
@@ -46,7 +46,7 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	#if no network is specified, the network derived from STRING is used as in the original publication
 	if(is.null(network))
 	{
-		load("data/STRING_network.RData")
+		data(STRING_network.RData)
 		network = STRING_network
 	}
 	network[,"score"] = min(as.numeric(network[,"score"]),0.8)
@@ -63,9 +63,9 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	}
 	# if pathwayDB_nodes is not spacified, we use predefined lists from Reactome, KEGG or NCI PID
 	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))	
-	if(pathwayDB == "reactome"){	load("data/Reactome.RData") 
-	}else if(pathwayDB == "kegg") { load("data/Kegg.RData")
-	}else if(pathwayDB == "nci"){	load("data/NCI_PID.RData") 
+	if(pathwayDB == "reactome"){	data(Reactome) 
+	}else if(pathwayDB == "kegg") { data(Kegg)
+	}else if(pathwayDB == "nci"){	data(NCI_PID) 
 	} else { 
 		print("no pathwayDB selected or defined. aborting")
 		return()

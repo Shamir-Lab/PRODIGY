@@ -6,7 +6,7 @@
 #' @param sample_origins a vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
 #' @return A named list of DEGs per sample.
 #' @examples
-#' load("data/COAD_Expression.RData")
+#' data(COAD_Expression)
 #' sample_origins = rep("tumor",ncol(expression_matrix))
 #' sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"
 #' expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]

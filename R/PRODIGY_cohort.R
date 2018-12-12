@@ -12,10 +12,10 @@
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
 #' @return A list of influence scores matrices.
 #' @examples
-#' load("data/COAD_SNP.RData")
-#' load("data/COAD_Expression.RData")
+#' data(COAD_SNP)
+#' data(COAD_Expression)
 #' # Load STRING network data 
-#' load("data/STRING_network.RData")
+#' data(STRING_network)
 #' network = STRING_network
 #' # Take samples for which SNP and expression is available 
 #' samples = intersect(colnames(expression_matrix),colnames(snp_matrix))[1:5]
@@ -47,16 +47,16 @@ PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,
 	}
 	# we use predefined lists of pathways from Reactome, KEGG or NCI PID
 	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))
-	if(pathwayDB == "reactome"){	load("data/Reactome.RData") 
-	}else if(pathwayDB == "kegg") { load("data/Kegg.RData")
-	}else if(pathwayDB == "nci"){	load("data/NCI_PID.RData") 
+	if(pathwayDB == "reactome"){	data(Reactome) 
+	}else if(pathwayDB == "kegg") { data(Kegg)
+	}else if(pathwayDB == "nci"){	data(NCI_PID) 
 	} else { 
 		print("no pathwayDB selected. aborting")
 		return()
 	}
 	if(is.null(network))
 	{
-		load("data/STRING_network.RData")
+		data(STRING_network)
 		network = STRING_network
 	}
 	#run PRODIGY for all samples

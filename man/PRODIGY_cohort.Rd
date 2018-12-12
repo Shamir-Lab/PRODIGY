@@ -34,10 +34,10 @@ A list of influence scores matrices.
 This is a wrapper that runs PRODIGY for a cohort of patients.
 }
 \examples{
-load("data/COAD_SNP.RData")
-load("data/COAD_Expression.RData")
+data(COAD_SNP)
+data(COAD_Expression)
 # Load STRING network data 
-load("data/STRING_network.RData")
+data(STRING_network)
 network = STRING_network
 # Take samples for which SNP and expression is available 
 samples = intersect(colnames(expression_matrix),colnames(snp_matrix))[1:5]

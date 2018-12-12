@@ -7,7 +7,7 @@
 ```
 Package: PRODIGY
 Title: Personalized prioritization of driver genes
-Version: 0.1-0
+Version: 1.0
 Authors: Gal Dinstag, Ron Shamir
 Reference: Dinstag, G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018)  
 Maintainer: Gal Dinstag <galdinstag@mail.tau.ac.il>
@@ -94,7 +94,7 @@ Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and disp
 ## Examples
 
 ```r
-load("data/COAD_Expression.RData")
+data(COAD_Expression)
 sample_origins = rep("tumor",ncol(expression_matrix))
 sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"
 expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
@@ -154,10 +154,10 @@ Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and disp
 
 ```r
 # Load SNP+expression data from TCGA
-load("data/COAD_SNP.RData")
-load("data/COAD_Expression.RData")
+data(COAD_SNP)
+data(COAD_Expression)
 # Load STRING network data
-load("data/STRING_network.RData")
+data(STRING_network)
 network = STRING_network
 sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
 sample_origins = rep("tumor",ncol(expression_matrix))
@@ -214,10 +214,10 @@ Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and disp
 ## Examples
 
 ```r
-load("data/COAD_SNP.RData")
-load("data/COAD_Expression.RData")
+data(COAD_SNP)
+data(COAD_Expression)
 # Load STRING network data
-load("data/STRING_network.RData")
+data(STRING_network)
 network = STRING_network
 # Take samples for which SNP and expression is available
 samples = intersect(colnames(expression_matrix),colnames(snp_matrix))[1:5]

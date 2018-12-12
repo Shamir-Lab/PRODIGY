@@ -16,6 +16,10 @@
 #' @export
 get_DEGs<-function(expression_matrix,samples,sample_origins=NULL)
 {
+	libraries = c("DESeq2")
+	for(j in 1:length(libraries)){
+	try({library(libraries[j],character.only=T)})
+	}
 	if(is.null(sample_origins))
 	{
 		sample_origins = rep("tumor",ncol(expression_matrix))

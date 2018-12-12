@@ -1,6 +1,9 @@
 # PRODIGY
 This R package prioritize driver genes for individual cancer patients.
-The details of the method are described in: Dinstag, G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018)
+
+The details of the method are described in: 
+Dinstag, G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018)
+https://www.biorxiv.org/content/early/2018/10/30/456723
 
 ## Package installation
 ```r
@@ -8,7 +11,7 @@ library(devtools)
 install_github("Shamir-Lab/PRODIGY")
 ```
 
-Needed packages:
+Needed packages and minimal versions:
 MASS_7.3-50
 DESeq2_1.16.1
 igraph_1.2.2

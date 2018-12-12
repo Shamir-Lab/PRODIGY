@@ -34,6 +34,11 @@
 PRODIGY_cohort<-function(snp_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,results_folder = "./",alpha=0.05,pathwayDB="reactome",
 			num_of_cores=1,sample_origins = NULL)
 {
+	#load needed R external packages
+	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF")
+	for(j in 1:length(libraries)){
+	try({library(libraries[j],character.only=T)})
+	}
 	if(is.null(samples))
 	{
 		print("no samples, aborting")

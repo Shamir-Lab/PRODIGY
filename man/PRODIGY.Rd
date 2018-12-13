@@ -4,19 +4,19 @@
 \alias{PRODIGY}
 \title{PRODIGY}
 \usage{
-PRODIGY(snp_matrix, expression_matrix, network = NULL, sample,
+PRODIGY(snv_matrix, expression_matrix, network = NULL, sample,
   diff_genes = NULL, alpha = 0.05, pathwayDB = "reactome",
   num_of_cores = 1, sample_origins = NULL, write_results = F,
   results_folder = "./")
 }
 \arguments{
-\item{snp_matrix}{A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.}
+\item{snv_matrix}{A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.}
 
 \item{expression_matrix}{A read count matrix with genes in rows and patients on columns. All genes must be contained in the global PPI network.}
 
 \item{network}{The global PPI network. Columns describe the source protein, destination protein and interaction score respectively. The network is considered as undirected.}
 
-\item{sample}{The sample label as appears in the SNP and expression matrices.}
+\item{sample}{The sample label as appears in the SNV and expression matrices.}
 
 \item{diff_genes}{A vector of the sample's differentially expressed genes (with gene names). All genes must be contained in the global PPI network.}
 
@@ -39,17 +39,17 @@ A matrix of influence scores for every mutation and every enriched pathway.
 This function runs the PRODIGY algorithm for a single patient.
 }
 \examples{
-# Load SNP+expression data from TCGA
-data(COAD_SNP)
+# Load SNV+expression data from TCGA
+data(COAD_SNV)
 data(COAD_Expression)
 # Load STRING network data 
 data(STRING_network)
 network = STRING_network
-sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
+sample = intersect(colnames(expression_matrix),colnames(snv_matrix))[1]
 # Identify sample origins (tumor or normal)
 sample_origins = rep("tumor",ncol(expression_matrix))
 sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
-res = PRODIGY<-function(snp_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)
+res = PRODIGY<-function(snv_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)
 }
 \references{
 Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).

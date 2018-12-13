@@ -1,10 +1,10 @@
 #' PRODIGY
 #'
 #' This function runs the PRODIGY algorithm for a single patient.
-#' @param snp_matrix A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.
+#' @param snv_matrix A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.
 #' @param expression_matrix A read count matrix with genes in rows and patients on columns. All genes must be contained in the global PPI network.
 #' @param network The global PPI network. Columns describe the source protein, destination protein and interaction score respectively. The network is considered as undirected.
-#' @param sample The sample label as appears in the SNP and expression matrices.
+#' @param sample The sample label as appears in the SNV and expression matrices.
 #' @param diff_genes A vector of the sample's differentially expressed genes (with gene names). All genes must be contained in the global PPI network.
 #' @param alpha the penalty exponent.
 #' @param pathwayDB The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").
@@ -14,17 +14,17 @@
 #' @param results_folder Location for resulting influence matrices storage (if write_results = T)
 #' @return A matrix of influence scores for every mutation and every enriched pathway.
 #' @examples
-#' # Load SNP+expression data from TCGA
-#' data(COAD_SNP)
+#' # Load SNV+expression data from TCGA
+#' data(COAD_SNV)
 #' data(COAD_Expression)
 #' # Load STRING network data 
 #' data(STRING_network)
 #' network = STRING_network
-#' sample = intersect(colnames(expression_matrix),colnames(snp_matrix))[1]
+#' sample = intersect(colnames(expression_matrix),colnames(snv_matrix))[1]
 #' # Identify sample origins (tumor or normal)
 #' sample_origins = rep("tumor",ncol(expression_matrix))
 #' sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
-#' res = PRODIGY<-function(snp_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)
+#' res = PRODIGY<-function(snv_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)
 #' @references
 #' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
@@ -32,7 +32,7 @@
 #' Schaefer, C. F. et al. PID: The pathway interaction database. Nucleic Acids Res. 37, 674-679 (2009).
 #' Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
 #' @export
-PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",
+PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",
 			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./")
 {
 	#load needed R external packages
@@ -40,10 +40,10 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	for(j in 1:length(libraries)){
 	try({library(libraries[j],character.only=T)})
 	}
-	#check if sample has both SNP and expression data
-	if(!(sample %in% colnames(snp_matrix) & sample %in% colnames(expression_matrix)))
+	#check if sample has both SNV and expression data
+	if(!(sample %in% colnames(snv_matrix) & sample %in% colnames(expression_matrix)))
 	{
-		print("sample is missing SNP or expression information, aborting")
+		print("sample is missing SNV or expression information, aborting")
 		return()
 	}
 	#if no network is specified, the network derived from STRING is used as in the original publication
@@ -55,7 +55,7 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	network[,"score"] = min(as.numeric(network[,"score"]),0.8)
 	network[,"score"] = 1-as.numeric(network[,"score"])
 	expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
-	snp_matrix = snp_matrix[which(rownames(snp_matrix) %in% unique(c(network[,1],network[,2]))),]
+	snv_matrix = snv_matrix[which(rownames(snv_matrix) %in% unique(c(network[,1],network[,2]))),]
 	original_network = network
 	network = graph_from_data_frame(network,directed=F)
 	#if sample_origins = NULL we assume the matrices follow the TCGA convention (tumors prefix is "-01" and normals are "-11")
@@ -91,7 +91,7 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 		print("no enriched pathways, aborting")
 		return() 
 	}
-	mutated_genes = rownames(snp_matrix)[which(snp_matrix[,sample]==1)]
+	mutated_genes = rownames(snv_matrix)[which(snv_matrix[,sample]==1)]
 	if(length(mutated_genes) < 2) {
 	 	print("no mutations to rank, aborting")
 		return() 
@@ -127,8 +127,8 @@ PRODIGY<-function(snp_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	}
 	if(write_results)
 	{
-		write.table(Influence_matrix[-1,],file=paste(results_folder,sample,"influence_scores.txt",sep="")
-					,quote=F,col.names=T,row.names=T)
+		write.table(Influence_matrix[-1,],file=paste(results_folder,sample,"_influence_scores.txt",sep="")
+					,quote=F,col.names=T,row.names=T,sep="\t")
 	}
 	return(Influence_matrix[-1,])
 }

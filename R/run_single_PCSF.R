@@ -24,11 +24,13 @@ run_single_PCSF<-function(pathway_network,driver_gene,original_network,pathway_p
 	terminals[names(pathway_prizes)] = pathway_prizes
 	#Steiner nodes have negative penalties as a function of their degree and alpha
 	terminals[which(!names(terminals) %in% names(pathway_prizes))] = -degs[which(!names(terminals) %in% names(pathway_prizes))]^alpha
-	terminals[driver_gene] = 100
+	#assign a high prize to the driver so it will be contained in the solution
+	driver_prize = sum(pathway_prizes)*10
+	terminals[driver_gene] = driver_prize
 	res = PCSF(pathway_network_igraph, terminals = terminals, w = max(round(sum(pathway_prizes)/10),20), b = 1, mu = 0)
  	if(length(V(res)) == 0){ score = c(0,0)
 	} else if(is_connected(res) & (driver_gene %in% V(res)$name)) {
-		score = c(sum(V(res)$prize) - sum(E(res)$weight) -100 -degs[driver_gene]^alpha,sum(V(res)$prize)-100)
+		score = c(sum(V(res)$prize) - sum(E(res)$weight) -driver_prize -degs[driver_gene]^alpha,sum(V(res)$prize)-driver_prize)
 	} else { score = c(-1,-1) }
 	return(score)
 }

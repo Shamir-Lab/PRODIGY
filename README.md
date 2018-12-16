@@ -35,7 +35,7 @@ data(COAD_Expression)
 data(STRING_network)
 network = STRING_network
 # Take samples for which SNP and expression is available 
-samples = intersect(colnames(expression_matrix),colnames(snp_matrix))[1:5]
+samples = intersect(colnames(expression_matrix),colnames(snv_matrix))[1:5]
 # Get differentially expressed genes (DEGs) for all samples
 expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
 library(DESeq2)

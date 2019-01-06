@@ -60,7 +60,7 @@ analyze_PRODIGY_results<-function(all_patients_scores)
 		# check bimodel distribution
 		possible_error = tryCatch(
 		{
-				bimodel_dist = normalmixEM(ranking,k=2,verbose=F)
+				bimodel_dist = normalmixEM(ranking,k=2)
 				unimodel_dist = MASS::fitdistr(ranking,"normal")
 		},
 		error=function(cond) {

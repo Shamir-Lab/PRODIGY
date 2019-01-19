@@ -44,7 +44,7 @@ DEGs = get_DEGs(expression_matrix,samples,sample_origins=NULL)
 sample_origins = rep("tumor",ncol(expression_matrix))
 sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 # Run PRODIGY
-all_patients_scores = PRODIGY_cohort(snp_matrix,expression_matrix,network=network,samples=samples,DEGs=DEGs,alpha=0.05,
+all_patients_scores = PRODIGY_cohort(snv_matrix,expression_matrix,network=network,samples=samples,DEGs=DEGs,alpha=0.05,
 			pathwayDB="reactome",num_of_cores=1,sample_origins=sample_origins,write_results = F, results_folder = "./")
 # Get driver gene rankings for all samples 
 results = analyze_PRODIGY_results(all_patients_scores) 

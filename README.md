@@ -17,6 +17,7 @@ PRODIGY was developed using and is dependent on the following packages (minimal 
 - MASS_7.3-50
 - DESeq2_1.16.1
 - igraph_1.2.2
+- graphite_1.22
 - ff_2.2-14
 - plyr_1.8.4
 - biomaRt_2.32.1

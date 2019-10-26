@@ -1,5 +1,5 @@
 #' @export
-get_diff_expressed_genes<-function(expression_matrix,sample,sample_origins)
+get_diff_expressed_genes<-function(expression_matrix,sample,sample_origins,beta=2,gamma=0.05)
 {
 	if(length(which(sample_origins == "normal")) < 1)
 	{	
@@ -23,10 +23,10 @@ get_diff_expressed_genes<-function(expression_matrix,sample,sample_origins)
 	diff_expression_count_matrix = diff_expression_count_matrix[rowSums(counts(diff_expression_count_matrix)) > 1,]
 	diff_expression_count_matrix$condition = factor(diff_expression_count_matrix$condition, levels = c("tumor","healthy"))
 	diff_expression_count_matrix = DESeq(diff_expression_count_matrix,betaPrior=TRUE)
-	res = results(diff_expression_count_matrix,alpha=0.05,lfcThreshold=1,altHypothesis="greaterAbs")
+	res = results(diff_expression_count_matrix,alpha=gamma,lfcThreshold=1,altHypothesis="greaterAbs")
 	res = res[!is.na(res$log2FoldChange),]
 	res = res[!is.na(res$pvalue),]
-	diff_genes = res[res$pvalue<0.05 & abs(res$log2FoldChange) > 2,2]
-	names(diff_genes) = rownames(res)[res$pvalue<0.05 & abs(res$log2FoldChange) > 2]
+	diff_genes = res[res$pvalue<gamma & abs(res$log2FoldChange) > beta,2]
+	names(diff_genes) = rownames(res)[res$pvalue<gamma & abs(res$log2FoldChange) > beta]
 	return(abs(diff_genes))
 }

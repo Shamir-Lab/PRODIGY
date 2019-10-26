@@ -12,6 +12,9 @@
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
 #' @param write_results Should the results be written to text files?
 #' @param results_folder Location for resulting influence matrices storage (if write_results = T)
+#' @param beta Minimal fold-change threshold for declering gene as differentially expressed by DESeq (default = 0.2)
+#' @param gamma FDR threshold for declering gene as differentially expressed by DESeq (default = 0.05)
+#' @param delta FDR threshold for declering a pathway as statistically enriched for differentially expressed genes (default = 0.05)
 #' @return A matrix of influence scores for every mutation and every enriched pathway.
 #' @examples
 #' # Load SNV+expression data from TCGA
@@ -24,16 +27,17 @@
 #' # Identify sample origins (tumor or normal)
 #' sample_origins = rep("tumor",ncol(expression_matrix))
 #' sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
-#' res = PRODIGY<-function(snv_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)
+#' res = PRODIGY<-function(snv_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins,beta=2,gamma=0.05,delta=0.05)
 #' @references
 #' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
-#' Gillespie, M., Vastrik, I., Eustachio, P. D., Schmidt, E. & Bono, B. De. Reactome?: a knowledgebase of biological pathways. Nucleic Acids Res. 33, 428-432 (2005).
+#' Gillespie, M., Vastrik, I., Eustachio, P. D., Schmidt, E. & Bono, B. De. Reactome: a knowledgebase of biological pathways. Nucleic Acids Res. 33, 428-432 (2005).
 #' Schaefer, C. F. et al. PID: The pathway interaction database. Nucleic Acids Res. 37, 674-679 (2009).
 #' Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
 #' @export
 PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",
-			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./")
+			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",
+			beta=2,gamma=0.05,delta=0.05)
 {
 	#load needed R external packages
 	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
@@ -49,7 +53,7 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	#if no network is specified, the network derived from STRING is used as in the original publication
 	if(is.null(network))
 	{
-		data(STRING_network.RData)
+		data(STRING_network)
 		network = STRING_network
 	}
 	network[,"score"] = min(as.numeric(network[,"score"]),0.8)
@@ -66,7 +70,7 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	}
 	# if pathwayDB_nodes is not spacified, we use predefined lists from Reactome, KEGG or NCI PID
 	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))	
-	data(pathwayDB_nodes)
+	data("pathwayDB_nodes")
 	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]] 
 	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]]
 	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]] 
@@ -83,10 +87,10 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 			return()
 		}
 		print("analyzing DEGs")	
-		diff_genes = get_diff_expressed_genes(expression_matrix,sample,sample_origins)
+		diff_genes = get_diff_expressed_genes(expression_matrix,sample,sample_origins,beta,gamma)
 	}
 	#get enriched pathways. Bins contain the DEGs belonging to each pathway
-	bins = get_enriched_pathways(diff_genes,pathwayDB,rownames(expression_matrix),pathwayDB_nodes)
+	bins = get_enriched_pathways(diff_genes,pathwayDB,rownames(expression_matrix),pathwayDB_nodes,delta)
 	if(length(bins)==0){
 		print("no enriched pathways, aborting")
 		return() 

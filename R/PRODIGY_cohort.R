@@ -14,6 +14,9 @@
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
 #' @param write_results Should the results be written to text files?
 #' @param results_folder Location for resulting influence matrices storage (if write_results = T) 
+#' @param beta Minimal fold-change threshold for declering gene as differentially expressed by DESeq (default = 0.2)
+#' @param gamma FDR threshold for declering gene as differentially expressed by DESeq (default = 0.05)
+#' @param delta FDR threshold for declering a pathway as statistically enriched for differentially expressed genes (default = 0.05)
 #' @return A list of influence scores matrices.
 #' @examples
 #' data(COAD_SNV)
@@ -30,13 +33,14 @@
 #' sample_origins = rep("tumor",ncol(expression_matrix))
 #' sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 #' # Run PRODIGY
-#' all_patients_scores = PRODIGY_cohort(snv_matrix,expression_matrix,network=network,samples=samples,DEGs=DEGs,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins=sample_origins)
+#' all_patients_scores = PRODIGY_cohort(snv_matrix,expression_matrix,network=network,samples=samples,DEGs=DEGs,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins=sample_origins,
+#' write_results = F, results_folder = "./",beta=2,gama=0.05,delta=0.05)
 #' @references
 #' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
 #' @export
 PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,alpha=0.05,pathwayDB="reactome",
-			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./")
+			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",beta=2,gama=0.05,delta=0.05)
 {
 	#load needed R external packages
 	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
@@ -72,13 +76,14 @@ PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,
 	#run PRODIGY for all samples
 	for(sample in samples)
 	{
-		print(sample)
-		if(!is.null(DEGs) & (sample %in% names(DEGs))) 
-		{	 
-			diff_genes = DEGs[[sample]] 
-		} else { diff_genes = NULL }
-		all_patients_scores[[sample]] = PRODIGY(snv_matrix,expression_matrix,network,sample,diff_genes,alpha=alpha,pathwayDB=pathwayDB,
-			num_of_cores=num_of_cores,sample_origins = sample_origins,write_results = write_results,results_folder = results_folder)
+	   print(sample)
+	   if(!is.null(DEGs) & (sample %in% names(DEGs))) 
+	   {	 
+	       diff_genes = DEGs[[sample]] 
+	   } else { diff_genes = NULL }
+	       all_patients_scores[[sample]] = PRODIGY(snv_matrix,expression_matrix,network,sample,diff_genes,alpha=alpha,pathwayDB=pathwayDB,
+	                                            num_of_cores=num_of_cores,sample_origins = sample_origins,write_results = write_results,results_folder = results_folder,
+	                                            beta = beta, gamma = gamma, delta = delta)
 	}
 	return(all_patients_scores)
 }

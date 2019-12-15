@@ -40,7 +40,7 @@
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
 #' @export
 PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,alpha=0.05,pathwayDB="reactome",
-			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",beta=2,gama=0.05,delta=0.05)
+			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",beta=2,gamma=0.05,delta=0.05)
 {
 	#load needed R external packages
 	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")

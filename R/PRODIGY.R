@@ -70,13 +70,13 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	}
 	# if pathwayDB_nodes is not spacified, we use predefined lists from Reactome, KEGG or NCI PID
 	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))	
-	data("pathwayDB_nodes")
-	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]] 
-	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]]
-	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]] 
+	data(pathwayDB_nodes)
+	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]][names(pathwayDB_nodes[["reactome"]]) %in% names(pathways("hsapiens", pathwayDB))]
+	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]][names(pathwayDB_nodes[["kegg"]]) %in% names(pathways("hsapiens", pathwayDB))]
+	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]][names(pathwayDB_nodes[["nci"]]) %in% names(pathways("hsapiens", pathwayDB))]
 	} else { 
-		print("no pathwayDB selected or defined. aborting")
-		return()
+	  print("no pathwayDB selected. aborting")
+	  return()
 	}
 	#get differentially expressed genes list
 	if(is.null(diff_genes))

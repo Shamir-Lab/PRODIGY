@@ -61,9 +61,9 @@ PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,
 	# we use predefined lists of pathways from Reactome, KEGG or NCI PID
 	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))
 	data(pathwayDB_nodes)
-	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]] 
-	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]]
-	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]] 
+	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]][names(pathwayDB_nodes[["reactome"]]) %in% names(pathways("hsapiens", pathwayDB))]
+	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]][names(pathwayDB_nodes[["kegg"]]) %in% names(pathways("hsapiens", pathwayDB))]
+	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]][names(pathwayDB_nodes[["nci"]]) %in% names(pathways("hsapiens", pathwayDB))]
 	} else { 
 		print("no pathwayDB selected. aborting")
 		return()

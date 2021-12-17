@@ -3,8 +3,8 @@
 This R package prioritize driver genes for individual cancer patients.
 
 The details of the method are described in
-Dinstag G. & Shamir R. PRODIGY: personalized prioritization of driver genes. bioRxiv (2018), 
-https://www.biorxiv.org/content/early/2018/10/30/456723
+Dinstag G. & Shamir R. PRODIGY: personalized prioritization of driver genes. Bioinformatics (2019), 
+https://academic.oup.com/bioinformatics/article/36/6/1831/5612092
 
 ## Package installation
 ```r

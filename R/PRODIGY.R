@@ -7,7 +7,7 @@
 #' @param sample The sample label as appears in the SNV and expression matrices.
 #' @param diff_genes A vector of the sample's differentially expressed genes (with gene names). All genes must be contained in the global PPI network.
 #' @param alpha the penalty exponent.
-#' @param pathwayDB The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").
+#' @param pathway_list A list where each object is a 3 column data.table (src,dest,weight). Names correspond to pathway names
 #' @param num_of_cores The number of CPU cores to be used by the influence scores calculation step.
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
 #' @param write_results Should the results be written to text files?
@@ -35,7 +35,7 @@
 #' Schaefer, C. F. et al. PID: The pathway interaction database. Nucleic Acids Res. 37, 674-679 (2009).
 #' Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
 #' @export
-PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",
+PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathway_list = NULL,
 			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",
 			beta=2,gamma=0.05,delta=0.05)
 {
@@ -68,14 +68,9 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 		sample_origins = rep("tumor",ncol(expression_matrix))
 		sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 	}
-	# if pathwayDB_nodes is not spacified, we use predefined lists from Reactome, KEGG or NCI PID
-	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))	
-	data(pathwayDB_nodes)
-	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]][names(pathwayDB_nodes[["reactome"]]) %in% names(pathways("hsapiens", pathwayDB))]
-	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]][names(pathwayDB_nodes[["kegg"]]) %in% names(pathways("hsapiens", pathwayDB))]
-	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]][names(pathwayDB_nodes[["nci"]]) %in% names(pathways("hsapiens", pathwayDB))]
-	} else { 
-	  print("no pathwayDB selected. aborting")
+	if(is.null(pathway_list))
+    {
+	  print("no pathway list. aborting")
 	  return()
 	}
 	#get differentially expressed genes list
@@ -89,8 +84,9 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 		print("analyzing DEGs")	
 		diff_genes = get_diff_expressed_genes(expression_matrix,sample,sample_origins,beta,gamma)
 	}
+    pathway_list_genes = setNames(lapply(pathway_list,function(x) get_pathway_genes_from_network(x)),names(pathway_list))
 	#get enriched pathways. Bins contain the DEGs belonging to each pathway
-	bins = get_enriched_pathways(diff_genes,pathwayDB,rownames(expression_matrix),pathwayDB_nodes,delta)
+	bins = get_enriched_pathways(diff_genes,pathwayDB = NULL,rownames(expression_matrix),pathwayDB_nodes = pathway_list_genes,delta)
 	if(length(bins)==0){
 		print("no enriched pathways, aborting")
 		return() 
@@ -112,7 +108,8 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 		pathway_name = names(bins)[i]
 		pathway_id = pathway_name
 		seed = bins[[i]]
-		pathway_network = get_pathway_network(pathwayDB,pathway_name,original_network)
+		#pathway_network = get_pathway_network(pathwayDB,pathway_name,original_network)
+		pathway_network = get_pathway_network_2(pathway_list[[pathway_name]],original_network)
 		if(is.null(nrow(pathway_network))){ next }
 		#prize nodes are DEGs belong to the pathway
 		pathway_prizes = diff_genes[bins[[pathway_name]]]
@@ -136,3 +133,33 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	}
 	return(Influence_matrix[-1,])
 }
+
+# Return vector of gene names participate in the pathway
+# @param pathway A 2 column data.table representing interactions
+# return A vector of gene names 
+get_pathway_genes_from_network<-function(pathway)
+{
+    return(unique(c(pathway[,1],pathway[,2])))
+}
+
+# Return a network induced by a given gene set
+# @param network A data.table with at least 2 columns. It is assumed that the first two columns contains the genes participating in the interaction
+# return A data.table representing the network
+get_network_from_gene_set<-function(network,gene_set)
+{
+    return(network[network[,1] %in% gene_set & network[,2] %in% gene_set,])
+}
+
+# Get list of data.table representing pathways using the graphite package 
+# @param source A string representing the graphite source to use. Default is Reactome
+# @param minimal_number_of_nodes An int, lower bound on the number of pathway genes
+# return A list of data.tables, each representing a single network
+get_pathway_list_from_graphite<-function(source = "reactome",minimal_number_of_nodes = 10)
+{
+	list_of_pathways = graphite::pathways("hsapiens",source)
+	num_of_nodes = lapply(list_of_pathways,function(x) length(nodes(x)))
+	pathway_names = names(list_of_pathways)[unlist(num_of_nodes) > minimal_number_of_nodes]
+	pathway_list = setNames(lapply(pathway_names,function(pathway_name) graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")]),pathway_names)
+	return(pathway_list)
+}
+

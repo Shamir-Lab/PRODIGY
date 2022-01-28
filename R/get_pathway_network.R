@@ -1,8 +1,6 @@
 #' @export
-get_pathway_network<-function(pathwayDB,pathway_name,original_network)
+get_pathway_network<-function(pathway_graph,original_network)
 {
-	list_of_pathways = pathways("hsapiens", pathwayDB)
-	pathway_graph = graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c(1,2)]
 	#delete duplicated edges
 	matches = match_df(data.frame(src=original_network[,1],dest=original_network[,2]),rbind(pathway_graph[,c(1,2)],pathway_graph[,c(2,1)]))
 	if(nrow(matches) > 0) { 

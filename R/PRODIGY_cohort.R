@@ -9,7 +9,7 @@
 #' @param sample The sample labels as appears in the SNV and expression matrices.
 #' @param DEGs Named list of differentially expressed genes for every sample. All genes must be contained in the global PPI network.
 #' @param alpha The penalty exponent.
-#' @param pathwayDB The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").
+#' @param pathway_list A list where each object is a 3 column data.table (src,dest,weight). Names correspond to pathway names
 #' @param num_of_cores The number of CPU cores to be used by the influence scores calculation step.
 #' @param sample_origins A vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.
 #' @param write_results Should the results be written to text files?
@@ -17,6 +17,7 @@
 #' @param beta Minimal fold-change threshold for declering gene as differentially expressed by DESeq (default = 0.2)
 #' @param gamma FDR threshold for declering gene as differentially expressed by DESeq (default = 0.05)
 #' @param delta FDR threshold for declering a pathway as statistically enriched for differentially expressed genes (default = 0.05)
+#' @param mutation_list An alternative to snv_matrix, one can simply provide a list of named vectors with genes to be analyzed by PRODIGY
 #' @return A list of influence scores matrices.
 #' @examples
 #' data(COAD_SNV)
@@ -39,8 +40,8 @@
 #' Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 #' Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
 #' @export
-PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,alpha=0.05,pathwayDB="reactome",
-			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",beta=2,gamma=0.05,delta=0.05)
+PRODIGY_cohort<-function(snv_matrix = NULL,expression_matrix,network=NULL,samples=NULL,DEGs=NULL,alpha=0.05,pathway_list=NULL,
+			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",beta=2,gamma=0.05,delta=0.05,mutation_list = NULL)
 {
 	#load needed R external packages
 	libraries = c("DESeq2","igraph","ff","plyr","biomaRt","parallel","PCSF","graphite")
@@ -58,16 +59,6 @@ PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,
 		sample_origins = rep("tumor",ncol(expression_matrix))
 		sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 	}
-	# we use predefined lists of pathways from Reactome, KEGG or NCI PID
-	# all pathways were acquired using the "graphite" R package (Gabriele Sales, Enrica Calura and Chiara Romualdi (2017))
-	data(pathwayDB_nodes)
-	if(pathwayDB == "reactome"){	pathwayDB_nodes = pathwayDB_nodes[["reactome"]][names(pathwayDB_nodes[["reactome"]]) %in% names(pathways("hsapiens", pathwayDB))]
-	}else if(pathwayDB == "kegg") { pathwayDB_nodes = pathwayDB_nodes[["kegg"]][names(pathwayDB_nodes[["kegg"]]) %in% names(pathways("hsapiens", pathwayDB))]
-	}else if(pathwayDB == "nci"){	pathwayDB_nodes = pathwayDB_nodes[["nci"]][names(pathwayDB_nodes[["nci"]]) %in% names(pathways("hsapiens", pathwayDB))]
-	} else { 
-		print("no pathwayDB selected. aborting")
-		return()
-	}
 	if(is.null(network))
 	{
 		data(STRING_network)
@@ -79,10 +70,17 @@ PRODIGY_cohort<-function(snv_matrix,expression_matrix,network=NULL,samples=NULL,
 	   print(sample)
 	   if(!is.null(DEGs) & (sample %in% names(DEGs))) 
 	   {	 
-	       diff_genes = DEGs[[sample]] 
+			diff_genes = DEGs[[sample]] 
 	   } else { diff_genes = NULL }
-	       all_patients_scores[[sample]] = PRODIGY(snv_matrix,expression_matrix,network,sample,diff_genes,alpha=alpha,pathwayDB=pathwayDB,
-	                                            num_of_cores=num_of_cores,sample_origins = sample_origins,write_results = write_results,results_folder = results_folder,
+			if(!is.null(mutation_list))
+			{
+				sample_mutations = mutation_list[[sample]]
+			} else {
+				sample_mutations = names(snv_matrix[snv_matrix[,sample] == 1,sample])
+			}
+			all_patients_scores[[sample]] = PRODIGY(sample_mutations,expression_matrix,network,sample,diff_genes,alpha=alpha,pathway_list=pathway_list,
+	                                            num_of_cores=num_of_cores,sample_origins = sample_origins,write_results = write_results,
+												results_folder = results_folder,
 	                                            beta = beta, gamma = gamma, delta = delta)
 	}
 	return(all_patients_scores)

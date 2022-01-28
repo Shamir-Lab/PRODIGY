@@ -1,7 +1,7 @@
 #' PRODIGY
 #'
 #' This function runs the PRODIGY algorithm for a single patient.
-#' @param snv_matrix A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.
+#' @param mutated_genes A vector of mutated genes to examine using PRODIGY.
 #' @param expression_matrix A read count matrix with genes in rows and patients on columns. All genes must be contained in the global PPI network.
 #' @param network The global PPI network. Columns describe the source protein, destination protein and interaction score respectively. The network is considered as undirected.
 #' @param sample The sample label as appears in the SNV and expression matrices.
@@ -35,7 +35,7 @@
 #' Schaefer, C. F. et al. PID: The pathway interaction database. Nucleic Acids Res. 37, 674-679 (2009).
 #' Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
 #' @export
-PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathway_list = NULL,
+PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes=NULL,alpha=0.05,pathway_list = NULL,
 			num_of_cores=1,sample_origins = NULL, write_results = F, results_folder = "./",
 			beta=2,gamma=0.05,delta=0.05)
 {
@@ -45,9 +45,9 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	try({library(libraries[j],character.only=T)})
 	}
 	#check if sample has both SNV and expression data
-	if(!(sample %in% colnames(snv_matrix) & sample %in% colnames(expression_matrix)))
+	if(!(sample %in% colnames(expression_matrix)))
 	{
-		print("sample is missing SNV or expression information, aborting")
+		print("sample is missing expression information, aborting")
 		return()
 	}
 	#if no network is specified, the network derived from STRING is used as in the original publication
@@ -59,10 +59,14 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	network[,"score"] = min(as.numeric(network[,"score"]),0.8)
 	network[,"score"] = 1-as.numeric(network[,"score"])
 	expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
-	snv_matrix = snv_matrix[which(rownames(snv_matrix) %in% unique(c(network[,1],network[,2]))),]
+	mutated_genes = mutated_genes[mutated_genes %in% unique(c(network[,1],network[,2]))]
+	if(length(mutated_genes) < 1) {
+	 	print("No mutated gene in large PPI network, aborting")
+		return() 
+	}
 	original_network = network
 	network = graph_from_data_frame(network,directed=F)
-	#if sample_origins = NULL we assume the matrices follow the TCGA convention (tumors prefix is "-01" and normals are "-11")
+	#if sample_origins = NULL we assume the matrices follow the TCGA convention (tumors suffix is "-01" and normals are "-11")
 	if(is.null(sample_origins))
 	{
 		sample_origins = rep("tumor",ncol(expression_matrix))
@@ -70,8 +74,8 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	}
 	if(is.null(pathway_list))
     {
-	  print("no pathway list. aborting")
-	  return()
+		print("no pathway list. using Reactome as default")
+		pathway_list = get_pathway_list_from_graphite(source = "reactome",minimal_number_of_nodes = 10,num_of_cores = num_of_cores)
 	}
 	#get differentially expressed genes list
 	if(is.null(diff_genes))
@@ -89,11 +93,6 @@ PRODIGY<-function(snv_matrix,expression_matrix,network=NULL,sample,diff_genes=NU
 	bins = get_enriched_pathways(diff_genes,pathwayDB = NULL,rownames(expression_matrix),pathwayDB_nodes = pathway_list_genes,delta)
 	if(length(bins)==0){
 		print("no enriched pathways, aborting")
-		return() 
-	}
-	mutated_genes = rownames(snv_matrix)[which(snv_matrix[,sample]==1)]
-	if(length(mutated_genes) < 2) {
-	 	print("no mutations to rank, aborting")
 		return() 
 	}
 	print(paste("checking",length(mutated_genes),"mutations and",length(bins),"pathways"))
@@ -150,16 +149,21 @@ get_network_from_gene_set<-function(network,gene_set)
     return(network[network[,1] %in% gene_set & network[,2] %in% gene_set,])
 }
 
-# Get list of data.table representing pathways using the graphite package 
+# Get list of data.table representing pathways using the graphite package. This could take a while so better to use more than a single core
 # @param source A string representing the graphite source to use. Default is Reactome
 # @param minimal_number_of_nodes An int, lower bound on the number of pathway genes
 # return A list of data.tables, each representing a single network
-get_pathway_list_from_graphite<-function(source = "reactome",minimal_number_of_nodes = 10)
+get_pathway_list_from_graphite<-function(source = "reactome",minimal_number_of_nodes = 10,num_of_cores = 1)
 {
 	list_of_pathways = graphite::pathways("hsapiens",source)
 	num_of_nodes = lapply(list_of_pathways,function(x) length(nodes(x)))
 	pathway_names = names(list_of_pathways)[unlist(num_of_nodes) > minimal_number_of_nodes]
-	pathway_list = setNames(lapply(pathway_names,function(pathway_name) graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")]),pathway_names)
+	if(num_of_cores == 1)
+	{
+		pathway_list = setNames(lapply(pathway_names,function(pathway_name) graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")]),pathway_names)	
+	} else {
+		pathway_list = setNames(mclapply(pathway_names,function(pathway_name) graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")],mc.cores=num_of_cores),pathway_names)	
+	}
 	return(pathway_list)
 }
 

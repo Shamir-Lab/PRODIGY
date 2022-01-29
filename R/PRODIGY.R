@@ -107,8 +107,7 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 		pathway_name = names(bins)[i]
 		pathway_id = pathway_name
 		seed = bins[[i]]
-		#pathway_network = get_pathway_network(pathwayDB,pathway_name,original_network)
-		pathway_network = get_pathway_network_2(pathway_list[[pathway_name]],original_network)
+		pathway_network = get_pathway_network(pathway_list[[pathway_name]],original_network)
 		if(is.null(nrow(pathway_network))){ next }
 		#prize nodes are DEGs belong to the pathway
 		pathway_prizes = diff_genes[bins[[pathway_name]]]

@@ -135,6 +135,7 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 # Return vector of gene names participate in the pathway
 # @param pathway A 2 column data.table representing interactions
 # return A vector of gene names 
+#' @export
 get_pathway_genes_from_network<-function(pathway)
 {
     return(unique(c(pathway[,1],pathway[,2])))
@@ -143,6 +144,7 @@ get_pathway_genes_from_network<-function(pathway)
 # Return a network induced by a given gene set
 # @param network A data.table with at least 2 columns. It is assumed that the first two columns contains the genes participating in the interaction
 # return A data.table representing the network
+#' @export
 get_network_from_gene_set<-function(network,gene_set)
 {
     return(network[network[,1] %in% gene_set & network[,2] %in% gene_set,])
@@ -152,6 +154,7 @@ get_network_from_gene_set<-function(network,gene_set)
 # @param source A string representing the graphite source to use. Default is Reactome
 # @param minimal_number_of_nodes An int, lower bound on the number of pathway genes
 # return A list of data.tables, each representing a single network
+#' @export
 get_pathway_list_from_graphite<-function(source = "reactome",minimal_number_of_nodes = 10,num_of_cores = 1)
 {
 	list_of_pathways = graphite::pathways("hsapiens",source)

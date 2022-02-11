@@ -157,6 +157,7 @@ get_network_from_gene_set<-function(network,gene_set)
 #' @export
 get_pathway_list_from_graphite<-function(source = "reactome",minimal_number_of_nodes = 10,num_of_cores = 1)
 {
+	library(graphite)
 	list_of_pathways = graphite::pathways("hsapiens",source)
 	num_of_nodes = lapply(list_of_pathways,function(x) length(nodes(x)))
 	pathway_names = names(list_of_pathways)[unlist(num_of_nodes) > minimal_number_of_nodes]

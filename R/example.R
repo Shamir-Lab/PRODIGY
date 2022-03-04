@@ -1,6 +1,4 @@
 #' Example run of PRODIGY
-#' download the package and change
-#' install("PRODIGY")
 #' library(PRODIGY)
 #' # Load SNV+expression data from TCGA
 #' data(COAD_SNV)

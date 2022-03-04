@@ -164,10 +164,24 @@ get_pathway_list_from_graphite<-function(source = "reactome",minimal_number_of_n
 	pathway_names = names(list_of_pathways)[unlist(num_of_nodes) > minimal_number_of_nodes]
 	if(num_of_cores == 1)
 	{
-		pathway_list = setNames(lapply(pathway_names,function(pathway_name) graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")]),pathway_names)	
+		pathway_list = setNames(lapply(pathway_names,function(pathway_name) get_single_graphite_pathway(pathway_name,list_of_pathways)),pathway_names)	
 	} else {
-		pathway_list = setNames(mclapply(pathway_names,function(pathway_name) graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")],mc.cores=num_of_cores),pathway_names)	
+		pathway_list = setNames(mclapply(pathway_names,function(pathway_name) get_single_graphite_pathway(pathway_name,list_of_pathways),mc.cores=num_of_cores),pathway_names)	
 	}
+	pathway_list = pathway_list[sapply(pathway_list,length) > 0]
 	return(pathway_list)
 }
 
+#' @export
+get_single_graphite_pathway<-function(pathway_name,list_of_pathways)
+{
+	pathway_edges = tryCatch({
+		return(graphite::edges(convertIdentifiers(list_of_pathways[[which(names(list_of_pathways) == pathway_name)]],"symbol"))[,c("src","dest")])
+	},
+	error = function(x){
+		return(data.frame())
+	},
+	warning = function(x){
+		return(data.frame())
+	})
+}

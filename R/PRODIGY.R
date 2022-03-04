@@ -44,12 +44,6 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 	for(j in 1:length(libraries)){
 	try({library(libraries[j],character.only=T)})
 	}
-	#check if sample has both SNV and expression data
-	if(!(sample %in% colnames(expression_matrix)))
-	{
-		print("sample is missing expression information, aborting")
-		return()
-	}
 	#if no network is specified, the network derived from STRING is used as in the original publication
 	if(is.null(network))
 	{
@@ -58,7 +52,6 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 	}
 	network[,"score"] = min(as.numeric(network[,"score"]),0.8)
 	network[,"score"] = 1-as.numeric(network[,"score"])
-	expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
 	mutated_genes = mutated_genes[mutated_genes %in% unique(c(network[,1],network[,2]))]
 	if(length(mutated_genes) < 1) {
 	 	print("No mutated gene in large PPI network, aborting")
@@ -66,12 +59,6 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 	}
 	original_network = network
 	network = graph_from_data_frame(network,directed=F)
-	#if sample_origins = NULL we assume the matrices follow the TCGA convention (tumors suffix is "-01" and normals are "-11")
-	if(is.null(sample_origins))
-	{
-		sample_origins = rep("tumor",ncol(expression_matrix))
-		sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
-	}
 	if(is.null(pathway_list))
     {
 		print("no pathway list. using Reactome as default")
@@ -80,6 +67,19 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 	#get differentially expressed genes list
 	if(is.null(diff_genes))
 	{
+		expression_matrix = expression_matrix[which(rownames(expression_matrix) %in% unique(c(network[,1],network[,2]))),]
+		#check if sample has expression data
+		if(!(sample %in% colnames(expression_matrix)))
+		{
+			print("sample is missing expression information, aborting")
+			return()
+		}
+		#if sample_origins = NULL we assume the matrices follow the TCGA convention (tumors suffix is "-01" and normals are "-11")
+		if(is.null(sample_origins))
+		{
+			sample_origins = rep("tumor",ncol(expression_matrix))
+			sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
+		}
 		if(length(which(sample_origins == "normal")) < 1)
 		{	
 			print("no normal samples, cannot perform differential expression analysis. aborting")

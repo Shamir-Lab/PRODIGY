@@ -4,7 +4,13 @@
 \alias{get_DEGs}
 \title{get_DEGs}
 \usage{
-get_DEGs(expression_matrix, samples, sample_origins = NULL)
+get_DEGs(
+  expression_matrix,
+  samples,
+  sample_origins = NULL,
+  beta = 2,
+  gamma = 0.05
+)
 }
 \arguments{
 \item{expression_matrix}{A read count matrix with genes in rows and patients on columns. All genes must be contained in the global PPI network.}
@@ -12,6 +18,10 @@ get_DEGs(expression_matrix, samples, sample_origins = NULL)
 \item{samples}{The sample labels as they appear in the expression matrix.}
 
 \item{sample_origins}{a vector that contains two optional values ("tumor","normal") corresponds to the tissues from which each column in expression_matrix was derived. This vector is utilized for differential expression analysis. If no vector is specified, the sample names of expression_matrix are assumed to be in TCGA format where last two digits correspond to sample type: "01"= solid tumor and "11"= normal.}
+
+\item{beta}{Minimal fold-change threshold for declering gene as differentially expressed by DESeq (default = 0.2)}
+
+\item{gamma}{FDR threshold for declering gene as differentially expressed by DESeq (default = 0.05)}
 }
 \value{
 A named list of DEGs per sample.

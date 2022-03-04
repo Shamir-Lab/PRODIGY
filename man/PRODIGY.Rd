@@ -4,13 +4,25 @@
 \alias{PRODIGY}
 \title{PRODIGY}
 \usage{
-PRODIGY(snv_matrix, expression_matrix, network = NULL, sample,
-  diff_genes = NULL, alpha = 0.05, pathwayDB = "reactome",
-  num_of_cores = 1, sample_origins = NULL, write_results = F,
-  results_folder = "./")
+PRODIGY(
+  mutated_genes,
+  expression_matrix,
+  network = NULL,
+  sample,
+  diff_genes = NULL,
+  alpha = 0.05,
+  pathway_list = NULL,
+  num_of_cores = 1,
+  sample_origins = NULL,
+  write_results = F,
+  results_folder = "./",
+  beta = 2,
+  gamma = 0.05,
+  delta = 0.05
+)
 }
 \arguments{
-\item{snv_matrix}{A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.}
+\item{mutated_genes}{A vector of mutated genes to examine using PRODIGY.}
 
 \item{expression_matrix}{A read count matrix with genes in rows and patients on columns. All genes must be contained in the global PPI network.}
 
@@ -22,7 +34,7 @@ PRODIGY(snv_matrix, expression_matrix, network = NULL, sample,
 
 \item{alpha}{the penalty exponent.}
 
-\item{pathwayDB}{The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").}
+\item{pathway_list}{A list where each object is a 3 column data.table (src,dest,weight). Names correspond to pathway names}
 
 \item{num_of_cores}{The number of CPU cores to be used by the influence scores calculation step.}
 
@@ -31,6 +43,12 @@ PRODIGY(snv_matrix, expression_matrix, network = NULL, sample,
 \item{write_results}{Should the results be written to text files?}
 
 \item{results_folder}{Location for resulting influence matrices storage (if write_results = T)}
+
+\item{beta}{Minimal fold-change threshold for declering gene as differentially expressed by DESeq (default = 0.2)}
+
+\item{gamma}{FDR threshold for declering gene as differentially expressed by DESeq (default = 0.05)}
+
+\item{delta}{FDR threshold for declering a pathway as statistically enriched for differentially expressed genes (default = 0.05)}
 }
 \value{
 A matrix of influence scores for every mutation and every enriched pathway.
@@ -49,12 +67,12 @@ sample = intersect(colnames(expression_matrix),colnames(snv_matrix))[1]
 # Identify sample origins (tumor or normal)
 sample_origins = rep("tumor",ncol(expression_matrix))
 sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
-res = PRODIGY<-function(snv_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins)
+res = PRODIGY<-function(snv_matrix,expression_matrix,network=network,sample,diff_genes=NULL,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins = sample_origins,beta=2,gamma=0.05,delta=0.05)
 }
 \references{
 Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).
 Gabriele Sales, Enrica Calura and Chiara Romualdi, graphite: GRAPH Interaction from pathway Topological Environment (2017).
-Gillespie, M., Vastrik, I., Eustachio, P. D., Schmidt, E. & Bono, B. De. Reactome?: a knowledgebase of biological pathways. Nucleic Acids Res. 33, 428-432 (2005).
+Gillespie, M., Vastrik, I., Eustachio, P. D., Schmidt, E. & Bono, B. De. Reactome: a knowledgebase of biological pathways. Nucleic Acids Res. 33, 428-432 (2005).
 Schaefer, C. F. et al. PID: The pathway interaction database. Nucleic Acids Res. 37, 674-679 (2009).
 Ogata, H. et al. KEGG: Kyoto encyclopedia of genes and genomes. Nucleic Acids Res. 27, 29-34 (1999).
 }

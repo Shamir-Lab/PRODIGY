@@ -4,10 +4,23 @@
 \alias{PRODIGY_cohort}
 \title{PRODIGY_cohort}
 \usage{
-PRODIGY_cohort(snv_matrix, expression_matrix, network = NULL,
-  samples = NULL, DEGs = NULL, alpha = 0.05,
-  pathwayDB = "reactome", num_of_cores = 1, sample_origins = NULL,
-  write_results = F, results_folder = "./")
+PRODIGY_cohort(
+  snv_matrix = NULL,
+  expression_matrix,
+  network = NULL,
+  samples = NULL,
+  DEGs = NULL,
+  alpha = 0.05,
+  pathway_list = NULL,
+  num_of_cores = 1,
+  sample_origins = NULL,
+  write_results = F,
+  results_folder = "./",
+  beta = 2,
+  gamma = 0.05,
+  delta = 0.05,
+  mutation_list = NULL
+)
 }
 \arguments{
 \item{snv_matrix}{A binary matrix with genes in rows and patients on columns. 1=mutation. All genes must be contained in the global PPI network.}
@@ -20,7 +33,7 @@ PRODIGY_cohort(snv_matrix, expression_matrix, network = NULL,
 
 \item{alpha}{The penalty exponent.}
 
-\item{pathwayDB}{The pathway DB name from which curated pathways are taken. Could be one of three built in reservoirs ("reactome","kegg","nci").}
+\item{pathway_list}{A list where each object is a 3 column data.table (src,dest,weight). Names correspond to pathway names}
 
 \item{num_of_cores}{The number of CPU cores to be used by the influence scores calculation step.}
 
@@ -29,6 +42,14 @@ PRODIGY_cohort(snv_matrix, expression_matrix, network = NULL,
 \item{write_results}{Should the results be written to text files?}
 
 \item{results_folder}{Location for resulting influence matrices storage (if write_results = T)}
+
+\item{beta}{Minimal fold-change threshold for declering gene as differentially expressed by DESeq (default = 0.2)}
+
+\item{gamma}{FDR threshold for declering gene as differentially expressed by DESeq (default = 0.05)}
+
+\item{delta}{FDR threshold for declering a pathway as statistically enriched for differentially expressed genes (default = 0.05)}
+
+\item{mutation_list}{An alternative to snv_matrix, one can simply provide a list of named vectors with genes to be analyzed by PRODIGY}
 
 \item{sample}{The sample labels as appears in the SNV and expression matrices.}
 }
@@ -55,7 +76,8 @@ DEGs = get_DEGs(expression_matrix,samples,sample_origins=NULL)
 sample_origins = rep("tumor",ncol(expression_matrix))
 sample_origins[substr(colnames(expression_matrix),nchar(colnames(expression_matrix)[1])-1,nchar(colnames(expression_matrix)[1]))=="11"] = "normal"	
 # Run PRODIGY
-all_patients_scores = PRODIGY_cohort(snv_matrix,expression_matrix,network=network,samples=samples,DEGs=DEGs,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins=sample_origins)
+all_patients_scores = PRODIGY_cohort(snv_matrix,expression_matrix,network=network,samples=samples,DEGs=DEGs,alpha=0.05,pathwayDB="reactome",num_of_cores=1,sample_origins=sample_origins,
+write_results = F, results_folder = "./",beta=2,gama=0.05,delta=0.05)
 }
 \references{
 Love, M. I., Huber, W. & Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biol. 15, 1-21 (2014).

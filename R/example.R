@@ -1,5 +1,5 @@
 #' Example run of PRODIGY
-#' download the package and change working directory to PRODIGY's root folder
+#' download the package and change
 #' install("PRODIGY")
 #' library(PRODIGY)
 #' # Load SNV+expression data from TCGA

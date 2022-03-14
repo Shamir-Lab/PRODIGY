@@ -50,7 +50,7 @@ PRODIGY<-function(mutated_genes,expression_matrix,network=NULL,sample,diff_genes
 		data(STRING_network)
 		network = STRING_network
 	}
-	network[,"score"] = min(as.numeric(network[,"score"]),0.8)
+	network[,"score"] = sapply(as.numeric(network[,"score"]),function(x) min(x,0.8))
 	network[,"score"] = 1-as.numeric(network[,"score"])
 	mutated_genes = mutated_genes[mutated_genes %in% unique(c(network[,1],network[,2]))]
 	if(length(mutated_genes) < 1) {

@@ -2,7 +2,7 @@
 get_pathway_network<-function(pathway_graph,original_network)
 {
 	#delete duplicated edges
-	matches = match_df(data.frame(src=original_network[,1],dest=original_network[,2]),rbind(pathway_graph[,c(1,2)],pathway_graph[,c(2,1)]))
+	matches = match_df(data.frame(src=original_network[,1],dest=original_network[,2]),as.data.frame(rbind(pathway_graph[,c(1,2)],pathway_graph[,c(2,1)])))
 	if(nrow(matches) > 0) { 
 		original_network = original_network[-as.numeric(rownames(matches)),] 
 	}
